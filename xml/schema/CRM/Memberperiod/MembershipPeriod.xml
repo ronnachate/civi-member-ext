@@ -4,7 +4,7 @@
   <base>CRM/Memberperiod</base>
   <class>MembershipPeriod</class>
   <name>civicrm_membership_period</name>
-  <comment>FIXME</comment>
+  <comment>Entity storing membership period record</comment>
   <add>4.4</add>
   <log>true</log>
 
