@@ -3,7 +3,7 @@
 <table>
   <base>CRM/Memberperiod</base>
   <class>MembershipPeriod</class>
-  <name>civicrm_membershipperiod</name>
+  <name>civicrm_membership_period</name>
   <comment>FIXME</comment>
   <add>4.4</add>
   <log>true</log>
@@ -13,7 +13,7 @@
     <type>int unsigned</type>
     <required>true</required>
     <comment>Unique MembershipPeriod ID</comment>
-    <add>4.4</add>
+    <add>4.7</add>
   </field>
   <primaryKey>
     <name>id</name>
@@ -21,17 +21,46 @@
   </primaryKey>
 
   <field>
-    <name>contact_id</name>
+    <name>start_date</name>
+    <uniqueName>membership_period_start_date</uniqueName>
+    <title>Membership Period Start Date</title>
+    <type>date</type>
+    <import>true</import>
+    <comment>Start date of membership period</comment>
+    <add>4.7</add>
+  </field>
+
+  <field>
+    <name>end_date</name>
+    <uniqueName>membership_period_end_date</uniqueName>
+    <title>Membership Period End Date</title>
+    <type>date</type>
+    <import>true</import>
+    <comment>End date of membership period</comment>
+    <add>4.7</add>
+  </field>
+
+  <field>
+    <name>membership_id</name>
     <type>int unsigned</type>
-    <comment>FK to Contact</comment>
-    <add>4.4</add>
+    <comment>FK to Membership</comment>
+    <add>4.7</add>
   </field>
   <foreignKey>
-    <name>contact_id</name>
-    <table>civicrm_contact</table>
+    <name>membership_id</name>
+    <table>civicrm_membership</table>
     <key>id</key>
-    <add>4.4</add>
+    <add>4.7</add>
     <onDelete>CASCADE</onDelete>
   </foreignKey>
 
+  <field>
+    <name>created_at</name>
+    <uniqueName>membership_period_created_at</uniqueName>
+    <title>Membership Period ctreated time</title>
+    <type>datetime</type>
+    <import>true</import>
+    <comment>End date of membership period</comment>
+    <add>4.7</add>
+  </field>
 </table>

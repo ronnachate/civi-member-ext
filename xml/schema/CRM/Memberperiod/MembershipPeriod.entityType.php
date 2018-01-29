@@ -6,6 +6,6 @@ return array (
   array (
     'name' => 'MembershipPeriod',
     'class' => 'CRM_Memberperiod_DAO_MembershipPeriod',
-    'table' => 'civicrm_membershipperiod',
+    'table' => 'civicrm_membership_period',
   ),
 );
