@@ -14,5 +14,5 @@ DROP TABLE IF EXISTS `civicrm_membership_period`;
       `created_at` datetime    COMMENT 'End date of membership period',
 
       PRIMARY KEY (`id`)
- ,    CONSTRAINT FK_civicrm_membership_period_membership_id FOREIGN KEY (`membership_id`) REFERENCES `civicr     m_membership`(`id`) ON DELETE CASCADE
+ ,    CONSTRAINT FK_civicrm_membership_period_membership_id FOREIGN KEY (`membership_id`) REFERENCES `civicrm_membership`(`id`) ON DELETE CASCADE
  )  ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci  ;
