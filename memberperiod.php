@@ -3,6 +3,9 @@
 require_once 'memberperiod.civix.php';
 use CRM_Memberperiod_ExtensionUtil as E;
 
+define("MEMBERSHIP_OBJ_NAME", "Membership", true);
+define("MEMBERSHIP__PAYMENT_OBJ_NAME", "MembershipPayment", true);
+
 /**
  * Implements hook_civicrm_config().
  *
@@ -139,14 +142,34 @@ function memberperiod_civicrm_preProcess($formName, &$form) {
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_navigationMenu
  *
-function memberperiod_civicrm_navigationMenu(&$menu) {
-  _memberperiod_civix_insert_navigation_menu($menu, NULL, array(
-    'label' => E::ts('The Page'),
-    'name' => 'the_page',
-    'url' => 'civicrm/the-page',
-    'permission' => 'access CiviReport,access CiviContribute',
-    'operator' => 'OR',
-    'separator' => 0,
-  ));
-  _memberperiod_civix_navigationMenu($menu);
-} // */
+ * */
+function memberperiod_civicrm_pre($op, $objectName, $id, &$params) {
+    error_log("pre hook work-----------------------------------------");
+    error_log($objectName);
+    error_log(json_encode($params));
+
+    if( $objectName == MEMBERSHIP_OBJ_NAME) {
+        //clear membeperiod session if exist
+    }
+}
+
+function memberperiod_civicrm_post($op, $objectName, $objectId, &$objectRef) {
+    error_log("post hook work-----------------------------------------");
+    error_log($objectName);
+    error_log(json_encode($objectRef));
+    if( $objectName == MEMBERSHIP_OBJ_NAME) {
+        //create member period
+        // do create
+        // store period id
+    }
+    switch ($objectName) {
+        case MEMBERSHIP_OBJ_NAME:
+            //create member period
+            // do create
+            // store period id
+            break;
+        case MEMBERSHIP__PAYMENT_OBJ_NAME:
+            //if found period id then update with contribution id
+            break;
+    }
+}
