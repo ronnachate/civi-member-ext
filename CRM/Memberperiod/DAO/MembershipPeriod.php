@@ -56,6 +56,15 @@ class CRM_Memberperiod_DAO_MembershipPeriod extends CRM_Core_DAO {
    */
   public $membership_id;
 
+
+    /**
+   * FK to FK to Contribution
+   *
+   * @var int unsigned
+   */
+  public $contribution_id;
+
+
   /**
    * End date of membership period
    *
@@ -143,6 +152,16 @@ class CRM_Memberperiod_DAO_MembershipPeriod extends CRM_Core_DAO {
           'bao' => 'CRM_Memberperiod_DAO_MembershipPeriod',
           'localizable' => 0,
           'FKClassName' => 'CRM_Member_DAO_Membership',
+        ],
+        'contribution_id' => [
+            'name' => 'contribution_id',
+            'type' => CRM_Utils_Type::T_INT,
+            'description' => 'FK to Contribution',
+            'table_name' => 'civicrm_membership_period',
+            'entity' => 'MembershipPeriod',
+            'bao' => 'CRM_Memberperiod_DAO_MembershipPeriod',
+            'localizable' => 0,
+            'FKClassName' => 'CRM_Contribute_DAO_Contribution',
         ],
         'membership_period_created_at' => [
           'name' => 'created_at',

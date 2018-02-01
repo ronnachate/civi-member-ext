@@ -4,7 +4,8 @@ require_once 'memberperiod.civix.php';
 use CRM_Memberperiod_ExtensionUtil as E;
 
 define("MEMBERSHIP_OBJ_NAME", "Membership", true);
-define("MEMBERSHIP__PAYMENT_OBJ_NAME", "MembershipPayment", true);
+define("MEMBERSHIP_PAYMENT_OBJ_NAME", "MembershipPayment", true);
+define("MEMBERSHIP_PERIOD_ID_SESSION", "membership_period_id", true);
 
 /**
  * Implements hook_civicrm_config().
@@ -126,17 +127,6 @@ function memberperiod_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) {
   _memberperiod_civix_civicrm_alterSettingsFolders($metaDataFolders);
 }
 
-// --- Functions below this ship commented out. Uncomment as required. ---
-
-/**
- * Implements hook_civicrm_preProcess().
- *
- * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_preProcess
- *
-function memberperiod_civicrm_preProcess($formName, &$form) {
-
-} // */
-
 /**
  * Implements hook_civicrm_navigationMenu().
  *
@@ -149,7 +139,9 @@ function memberperiod_civicrm_pre($op, $objectName, $id, &$params) {
     error_log(json_encode($params));
 
     if( $objectName == MEMBERSHIP_OBJ_NAME) {
+        $session = CRM_Core_Session::singleton();
         //clear membeperiod session if exist
+        //store date for term checking
     }
 }
 
@@ -157,19 +149,23 @@ function memberperiod_civicrm_post($op, $objectName, $objectId, &$objectRef) {
     error_log("post hook work-----------------------------------------");
     error_log($objectName);
     error_log(json_encode($objectRef));
-    if( $objectName == MEMBERSHIP_OBJ_NAME) {
-        //create member period
-        // do create
-        // store period id
-    }
+    $session = CRM_Core_Session::singleton();
     switch ($objectName) {
         case MEMBERSHIP_OBJ_NAME:
+            //calculate term and date by membership_type_id
             //create member period
+            //clear date for term checking
             // do create
             // store period id
+            $session->set(MEMBERSHIP_PERIOD_ID_SESSION, $contactID);
             break;
         case MEMBERSHIP__PAYMENT_OBJ_NAME:
             //if found period id then update with contribution id
+            $membership_period_id = CRM_Core_Session::singleton()->get(MEMBERSHIP_PERIOD_ID_SESSION);
+            if ($membership_period_id) {
+
+                //clear
+            }
             break;
     }
 }
