@@ -3,9 +3,10 @@
 require_once 'memberperiod.civix.php';
 use CRM_Memberperiod_ExtensionUtil as E;
 
-define("MEMBERSHIP_OBJ_NAME", "Membership", true);
-define("MEMBERSHIP_PAYMENT_OBJ_NAME", "MembershipPayment", true);
-define("MEMBERSHIP_PERIOD_ID_SESSION", "membership_period_id", true);
+define('MEMBERSHIP_OBJ_NAME', 'Membership', true);
+define('MEMBERSHIP_PAYMENT_OBJ_NAME', 'MembershipPayment', true);
+define('MEMBERSHIP_PERIOD_ID_SESSION', 'membership_period_id', true);
+define('DEFAULT_DATETIME_FORMAT', 'YmdHis', true);
 
 /**
  * Implements hook_civicrm_config().
@@ -140,7 +141,7 @@ function memberperiod_civicrm_pre($op, $objectName, $id, &$params) {
 
     if( $objectName == MEMBERSHIP_OBJ_NAME) {
         $session = CRM_Core_Session::singleton();
-        //clear membeperiod session if exist
+        //clear membeperiod id session if exist
         //store date for term checking
     }
 }
@@ -155,15 +156,25 @@ function memberperiod_civicrm_post($op, $objectName, $objectId, &$objectRef) {
             //calculate term and date by membership_type_id
             //create member period
             //clear date for term checking
-            // do create
+            // do create ----- Need to check if multiple term renew
             // store period id
-            $session->set(MEMBERSHIP_PERIOD_ID_SESSION, $contactID);
+            $now = date(DEFAULT_DATETIME_FORMAT);
+            $membership_period_obj = array(
+                'membership_id' => $membership_id,
+                'start_date' => CRM_Utils_Date::isoToMysql($objectRef->end_date),
+                'end_date' => CRM_Utils_Date::isoToMysql($objectRef->end_date),
+                'created_at' => CRM_Utils_Date::isoToMysql($now)
+            );
+            // $membership_period = CRM_Membershipperiod_BAO_MembershipPeriod::createOrUpdate();
+            // if( $membership_period ) {
+            //     $session->set(MEMBERSHIP_PERIOD_ID_SESSION, $membership_period->id);
+            // }
             break;
         case MEMBERSHIP__PAYMENT_OBJ_NAME:
             //if found period id then update with contribution id
             $membership_period_id = CRM_Core_Session::singleton()->get(MEMBERSHIP_PERIOD_ID_SESSION);
             if ($membership_period_id) {
-
+                error_log("renew with contribution");
                 //clear
             }
             break;

@@ -58,6 +58,7 @@
     <type>int unsigned</type>
     <comment>FK to Contribution</comment>
     <add>4.7</add>
+    <required>false</required>
   </field>
   <foreignKey>
     <name>contribution_id</name>
