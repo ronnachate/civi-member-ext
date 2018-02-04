@@ -7,6 +7,7 @@ define('MEMBERSHIP_OBJ_NAME', 'Membership', true);
 define('MEMBERSHIP_PAYMENT_OBJ_NAME', 'MembershipPayment', true);
 define('MEMBERSHIP_PERIOD_ID_SESSION', 'membership_period_id', true);
 define('DEFAULT_DATETIME_FORMAT', 'YmdHis', true);
+define('PREVIUOS_MEMBERSHIP_END_DATE', 'YmdHis', true);
 
 /**
  * Implements hook_civicrm_config().
@@ -143,6 +144,16 @@ function memberperiod_civicrm_pre($op, $objectName, $id, &$params) {
         $session = CRM_Core_Session::singleton();
         //clear membeperiod id session if exist
         //store date for term checking
+        if( $id ) {
+          $params = array('id' => $membershipId);
+          $values = array();
+          $previous_membership_detail = CRM_Member_BAO_Membership::getValues($params, $values);
+          if($previous_membership_detail) {
+            $session = CRM_Core_Session::singleton();
+            $session->set(PREVIUOS_MEMBERSHIP_END_DATE, $previous_membership_detail->end_date);
+          }
+          
+        }
     }
 }
 
