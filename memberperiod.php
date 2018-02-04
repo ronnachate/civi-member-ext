@@ -165,17 +165,18 @@ function memberperiod_civicrm_post($op, $objectName, $objectId, &$objectRef) {
                 'end_date' => CRM_Utils_Date::isoToMysql($objectRef->end_date),
                 'created_at' => CRM_Utils_Date::isoToMysql($now)
             );
-            // $membership_period = CRM_Membershipperiod_BAO_MembershipPeriod::createOrUpdate();
-            // if( $membership_period ) {
-            //     $session->set(MEMBERSHIP_PERIOD_ID_SESSION, $membership_period->id);
-            // }
+            $membership_period = CRM_Membershipperiod_BAO_MembershipPeriod::createOrUpdate();
+            if( $membership_period ) {
+                 $session->set(MEMBERSHIP_PERIOD_ID_SESSION, $membership_period->id);
+            }
             break;
         case MEMBERSHIP__PAYMENT_OBJ_NAME:
             //if found period id then update with contribution id
             $membership_period_id = CRM_Core_Session::singleton()->get(MEMBERSHIP_PERIOD_ID_SESSION);
             if ($membership_period_id) {
+               CRM_Membershipperiod_BAO_MembershipPeriod::updateWithContribution($membership_period_id, $objectRef->id);
                 error_log("renew with contribution");
-                //clear
+                //clear session
             }
             break;
     }
