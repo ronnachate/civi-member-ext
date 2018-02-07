@@ -8,6 +8,7 @@ define('MEMBERSHIP_PAYMENT_OBJ_NAME', 'MembershipPayment', true);
 define('MEMBERSHIP_PERIOD_ID_SESSION', 'membership_period_id', true);
 define('DEFAULT_DATETIME_FORMAT', 'YmdHis', true);
 define('PREVIUOS_MEMBERSHIP_END_DATE', 'YmdHis', true);
+define('MYSQL_DATE_FORMAT', 'Y-m-d H:i:s', true);
 
 /**
  * Implements hook_civicrm_config().
@@ -136,19 +137,20 @@ function memberperiod_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) {
  *
  * */
 function memberperiod_civicrm_pre($op, $objectName, $id, &$params) {
-    error_log("pre hook work-----------------------------------------");
-    error_log($objectName);
-    error_log(json_encode($params));
+    // error_log("pre hook work-----------------------------------------");
+    // error_log($objectName);
+    // error_log(json_encode($params));
 
     if( $objectName == MEMBERSHIP_OBJ_NAME) {
         $session = CRM_Core_Session::singleton();
         //clear membeperiod id session if exist
         //store date for term checking
         if( $id ) {
-            $params = array('id' => $id);
+            $get_params = array('id' => $id);
             $values = array();
-            $previous_membership_detail = CRM_Member_BAO_Membership::getValues($params, $values);
-            if($previous_membership_detail) {
+            $previous_membership_details = CRM_Member_BAO_Membership::getValues($get_params, $values);
+            if($previous_membership_details) {
+                $previous_membership_detail = $previous_membership_details[$id];
                 $session = CRM_Core_Session::singleton();
                 $session->set(PREVIUOS_MEMBERSHIP_END_DATE, $previous_membership_detail->end_date);
             }
@@ -157,27 +159,53 @@ function memberperiod_civicrm_pre($op, $objectName, $id, &$params) {
 }
 
 function memberperiod_civicrm_post($op, $objectName, $objectId, &$objectRef) {
-    error_log("post hook work-----------------------------------------");
-    error_log($objectName);
-    error_log(json_encode($objectRef));
     $session = CRM_Core_Session::singleton();
     switch ($objectName) {
         case MEMBERSHIP_OBJ_NAME:
             //calculate term and date by membership_type_id
-            //create member period
-            //clear date for term checking
-            // do create ----- Need to check if multiple term renew
-            // store period id
-            $now = date(DEFAULT_DATETIME_FORMAT);
-            $membership_period_obj = array(
-                'membership_id' => $objectRef->id,
-                'start_date' => CRM_Utils_Date::isoToMysql($objectRef->start_date),
-                'end_date' => CRM_Utils_Date::isoToMysql($objectRef->end_date),
-                'created_at' => CRM_Utils_Date::isoToMysql($now)
-            );
-            $membership_period = CRM_Memberperiod_BAO_MembershipPeriod::createOrUpdate($membership_period_obj);
-            if( $membership_period ) {
-                 $session->set(MEMBERSHIP_PERIOD_ID_SESSION, $membership_period->id);
+            //get membership type
+            $params = array('id' => $objectRef->membership_type_id);
+            $values = array();
+            $membership_type = CRM_Member_BAO_MembershipType::retrieve($params, $values);
+            $duration = $membership_type->duration_interval;
+            $duration_unit = $membership_type->duration_unit;
+            $term_end_date = new DateTime();
+            $previuod_endate_str = CRM_Core_Session::singleton()->get(PREVIUOS_MEMBERSHIP_END_DATE);
+            if( $previuod_endate_str ) {
+                $previuod_end_date = new DateTime($previuod_endate_str);
+                $diff = date_diff(new DateTime($objectRef->end_date), $previuod_end_date);
+                if( $duration_unit == 'year') {
+                    $terms = $diff->y / $duration;
+                }
+                else if( $duration_unit == 'month') {
+                    $terms = $diff->m / $duration;
+                }
+                $term_end_date = $previuod_end_date;
+            }
+            for ($i = 0; $i < $terms; $i++) {
+                $mysql_start_date = $term_end_date->format(MYSQL_DATE_FORMAT);
+                //calculate end date of current term
+                $interval_str = 'P'.$duration;
+                if( $duration_unit == 'year') {
+                    $interval_str .= 'Y';
+                }
+                else if( $duration_unit == 'month') {
+                    $interval_str .= 'M';
+                }
+                $term_end_date->add(new DateInterval($interval_str));
+                $mysql_end_date = $term_end_date->format(MYSQL_DATE_FORMAT);
+                //store period record
+                $now = date(DEFAULT_DATETIME_FORMAT);
+                $membership_period_obj = array(
+                    'membership_id' => $objectRef->id,
+                    'start_date' => $mysql_start_date,
+                    'end_date' => $mysql_end_date,
+                    'created_at' => CRM_Utils_Date::isoToMysql($now)
+                );
+                $membership_period = CRM_Memberperiod_BAO_MembershipPeriod::createOrUpdate($membership_period_obj);
+                if( $membership_period ) {
+                    $session->set(MEMBERSHIP_PERIOD_ID_SESSION, $membership_period->id);
+                }
             }
             break;
         case MEMBERSHIP_PAYMENT_OBJ_NAME:
@@ -185,7 +213,6 @@ function memberperiod_civicrm_post($op, $objectName, $objectId, &$objectRef) {
             $membership_period_id = CRM_Core_Session::singleton()->get(MEMBERSHIP_PERIOD_ID_SESSION);
             if ($membership_period_id) {
                 CRM_Memberperiod_BAO_MembershipPeriod::updateWithContribution($membership_period_id, $objectRef->id);
-                error_log("renew with contribution");
                 //clear session
             }
             break;

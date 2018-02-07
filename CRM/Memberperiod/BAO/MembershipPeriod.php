@@ -20,7 +20,7 @@ class CRM_Memberperiod_BAO_MembershipPeriod extends CRM_Memberperiod_DAO_Members
     $instance = new $className();
     $instance->copyValues($params);
     $instance->save();
-    CRM_Utils_Hook::post($hook, $entityName, $instance->id, $instance);
+    CRM_Utils_Hook::post($hook, MEMBERSHIP_PERIOD_ENTITY_NAME, $instance->id, $instance);
 
     return $instance;
   }
@@ -35,7 +35,7 @@ class CRM_Memberperiod_BAO_MembershipPeriod extends CRM_Memberperiod_DAO_Members
   public static function updateWithContribution($membership_period_id, $contribution_id) {
     $className = MEMBERSHIP_PERIOD_CLASS_NAME;
     $member_period_dao = new $className();
-    $member_period_dao->id = $id;
+    $member_period_dao->id = $membership_period_id;
     $result = false;
     if ($member_period_dao->find(TRUE)) {
       $member_period_dao->contribution_id = $contribution_id;
