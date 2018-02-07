@@ -143,6 +143,7 @@ function memberperiod_civicrm_pre($op, $objectName, $id, &$params) {
 
     if( $objectName == MEMBERSHIP_OBJ_NAME) {
         $session = CRM_Core_Session::singleton();
+        $session->set(MEMBERSHIP_PERIOD_ID_SESSION, NULL);
         //clear membeperiod id session if exist
         //store date for term checking
         if( $id ) {
@@ -151,7 +152,6 @@ function memberperiod_civicrm_pre($op, $objectName, $id, &$params) {
             $previous_membership_details = CRM_Member_BAO_Membership::getValues($get_params, $values);
             if($previous_membership_details) {
                 $previous_membership_detail = $previous_membership_details[$id];
-                $session = CRM_Core_Session::singleton();
                 $session->set(PREVIUOS_MEMBERSHIP_END_DATE, $previous_membership_detail->end_date);
             }
         }
@@ -210,11 +210,11 @@ function memberperiod_civicrm_post($op, $objectName, $objectId, &$objectRef) {
             }
             break;
         case MEMBERSHIP_PAYMENT_OBJ_NAME:
+            $session = CRM_Core_Session::singleton();
             //if found period id then update with contribution id
-            $membership_period_id = CRM_Core_Session::singleton()->get(MEMBERSHIP_PERIOD_ID_SESSION);
+            $membership_period_id = $session->get(MEMBERSHIP_PERIOD_ID_SESSION);
             if ($membership_period_id) {
                 CRM_Memberperiod_BAO_MembershipPeriod::updateWithContribution($membership_period_id, $objectRef->id);
-                //clear session
             }
             break;
     }
