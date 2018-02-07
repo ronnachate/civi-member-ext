@@ -171,17 +171,18 @@ function memberperiod_civicrm_post($op, $objectName, $objectId, &$objectRef) {
             $duration_unit = $membership_type->duration_unit;
             $term_end_date = new DateTime();
             $previuod_endate_str = CRM_Core_Session::singleton()->get(PREVIUOS_MEMBERSHIP_END_DATE);
+            $terms_start_date = new DateTime($objectRef->start_date);
             if( $previuod_endate_str ) {
-                $previuod_end_date = new DateTime($previuod_endate_str);
-                $diff = date_diff(new DateTime($objectRef->end_date), $previuod_end_date);
-                if( $duration_unit == 'year') {
-                    $terms = $diff->y / $duration;
-                }
-                else if( $duration_unit == 'month') {
-                    $terms = $diff->m / $duration;
-                }
-                $term_end_date = $previuod_end_date;
+                $terms_start_date = new DateTime($previuod_endate_str);
             }
+            $diff = date_diff(new DateTime($objectRef->end_date),  $terms_start_date);
+            if( $duration_unit == 'year') {
+                $terms = $diff->y / $duration;
+            }
+            else if( $duration_unit == 'month') {
+                $terms = $diff->m / $duration;
+            }
+            $term_end_date = $terms_start_date;
             for ($i = 0; $i < $terms; $i++) {
                 $mysql_start_date = $term_end_date->format(MYSQL_DATE_FORMAT);
                 //calculate end date of current term
