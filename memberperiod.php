@@ -6,6 +6,7 @@ use CRM_Memberperiod_ExtensionUtil as E;
 define('MEMBERSHIP_OBJ_NAME', 'Membership', true);
 define('MEMBERSHIP_PAYMENT_OBJ_NAME', 'MembershipPayment', true);
 define('MEMBERSHIP_PERIOD_ID_SESSION', 'membership_period_id', true);
+define('MEMBERSHIP_PERIOD_SESSION_DELIMITER', ',', true);
 define('DEFAULT_DATETIME_FORMAT', 'YmdHis', true);
 define('PREVIUOS_MEMBERSHIP_END_DATE', 'YmdHis', true);
 define('MYSQL_DATE_FORMAT', 'Y-m-d H:i:s', true);
@@ -137,15 +138,10 @@ function memberperiod_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) {
  *
  * */
 function memberperiod_civicrm_pre($op, $objectName, $id, &$params) {
-    // error_log("pre hook work-----------------------------------------");
-    // error_log($objectName);
-    // error_log(json_encode($params));
-
     if( $objectName == MEMBERSHIP_OBJ_NAME) {
         $session = CRM_Core_Session::singleton();
+        //clear membeperiod id session
         $session->set(MEMBERSHIP_PERIOD_ID_SESSION, NULL);
-        //clear membeperiod id session if exist
-        //store date for term checking
         if( $id ) {
             $get_params = array('id' => $id);
             $values = array();
@@ -170,8 +166,8 @@ function memberperiod_civicrm_post($op, $objectName, $objectId, &$objectRef) {
             $duration = $membership_type->duration_interval;
             $duration_unit = $membership_type->duration_unit;
             $term_end_date = new DateTime();
-            $previuod_endate_str = CRM_Core_Session::singleton()->get(PREVIUOS_MEMBERSHIP_END_DATE);
             $terms_start_date = new DateTime($objectRef->start_date);
+            $previuod_endate_str = CRM_Core_Session::singleton()->get(PREVIUOS_MEMBERSHIP_END_DATE);
             if( $previuod_endate_str ) {
                 $terms_start_date = new DateTime($previuod_endate_str);
             }
@@ -183,6 +179,7 @@ function memberperiod_civicrm_post($op, $objectName, $objectId, &$objectRef) {
                 $terms = $diff->m / $duration;
             }
             $term_end_date = $terms_start_date;
+            $perios_ids = array();
             for ($i = 0; $i < $terms; $i++) {
                 $mysql_start_date = $term_end_date->format(MYSQL_DATE_FORMAT);
                 //calculate end date of current term
@@ -204,17 +201,21 @@ function memberperiod_civicrm_post($op, $objectName, $objectId, &$objectRef) {
                     'created_at' => CRM_Utils_Date::isoToMysql($now)
                 );
                 $membership_period = CRM_Memberperiod_BAO_MembershipPeriod::createOrUpdate($membership_period_obj);
-                if( $membership_period ) {
-                    $session->set(MEMBERSHIP_PERIOD_ID_SESSION, $membership_period->id);
-                }
+                array_push($perios_ids, $membership_period->id);
+            }
+            if( count($perios_ids) > 0 ) {
+                error_log("Set ids ". implode(MEMBERSHIP_PERIOD_SESSION_DELIMITER, $perios_ids) . " -----------------------------");
+                $session->set(MEMBERSHIP_PERIOD_IDS_SESSION, implode(MEMBERSHIP_PERIOD_SESSION_DELIMITER, $perios_ids));
             }
             break;
         case MEMBERSHIP_PAYMENT_OBJ_NAME:
             $session = CRM_Core_Session::singleton();
             //if found period id then update with contribution id
-            $membership_period_id = $session->get(MEMBERSHIP_PERIOD_ID_SESSION);
-            if ($membership_period_id) {
-                CRM_Memberperiod_BAO_MembershipPeriod::updateWithContribution($membership_period_id, $objectRef->id);
+            $membership_period_ids_str = $session->get(MEMBERSHIP_PERIOD_IDS_SESSION);
+            if ($membership_period_ids_str) {
+                error_log("Found " . $membership_period_ids_str." ---------------------------------------");
+                $membership_period_ids = explode(MEMBERSHIP_PERIOD_SESSION_DELIMITER, $membership_period_ids_str);
+                CRM_Memberperiod_BAO_MembershipPeriod::updateWithContribution($membership_period_ids, $objectRef->id);
             }
             break;
     }
