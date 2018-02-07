@@ -228,3 +228,16 @@ function memberperiod_civicrm_post($op, $objectName, $objectId, &$objectRef) {
         }
     }
 }
+
+function memberperiod_civicrm_tabset($tabsetName, &$tabs, $context) {
+    if ($tabsetName == 'civicrm/contact/view') {
+        $contactId = $context['contact_id'];
+        $url = CRM_Utils_System::url( 'civicrm/contact/view/contribution',
+                                      "reset=1&snippet=1&force=1&cid=$contactId" );
+        $tabs[] = array( 'id' => 'mySupercoolTab',
+          'url'   => $url,
+          'title' => 'Membership history',
+          'weight' => 300,
+        );
+    }
+}
