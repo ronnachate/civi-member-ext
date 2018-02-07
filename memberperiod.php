@@ -178,6 +178,7 @@ function memberperiod_civicrm_post($op, $objectName, $objectId, &$objectRef) {
                     $terms_start_date = new DateTime($previuod_endate_str);
                 }
                 $membership_end_date = new DateTime($objectRef->end_date);
+                //fix attr y in date diff function
                 $membership_end_date->add(new DateInterval('P'.DATE_DIFF_PATCHING.'D'));
                 $diff = date_diff($membership_end_date,  $terms_start_date);
                 if( $duration_unit == 'year') {
