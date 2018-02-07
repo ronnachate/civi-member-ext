@@ -34,9 +34,9 @@ class CRM_Memberperiod_BAO_MembershipPeriod extends CRM_Memberperiod_DAO_Members
 
     public static function updateWithContribution($membership_period_ids, $contribution_id) {
         $className = MEMBERSHIP_PERIOD_CLASS_NAME;
-        foreach ($membership_period_ids as &$id) {
+        foreach ($membership_period_ids as &$period_id) {
             $member_period_dao = new $className();
-            $member_period_dao->id = $id;
+            $member_period_dao->id = $period_id;
             if ($member_period_dao->find(TRUE)) {
                 $member_period_dao->contribution_id = $contribution_id;
                 $member_period_dao->save();
