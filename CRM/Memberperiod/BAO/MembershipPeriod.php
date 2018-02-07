@@ -26,7 +26,7 @@ class CRM_Memberperiod_BAO_MembershipPeriod extends CRM_Memberperiod_DAO_Members
     }
 
     /**
-     * GET MembershipPeriod by id
+     * Update membership period with contribution is
      *
      * @param array $params key-value pairs
      * @return bool
@@ -43,5 +43,28 @@ class CRM_Memberperiod_BAO_MembershipPeriod extends CRM_Memberperiod_DAO_Members
                 $member_period_dao->free();
             }
         }
+    }
+
+    /**
+     * GET MembershipPeriod by membet ship id
+     *
+     * @param array $params key-value pairs
+     * @return bool
+    */
+
+    public static function getByMembershipId($membership_id) {
+        $member_period_array = Array();
+        $className = MEMBERSHIP_PERIOD_CLASS_NAME;
+        $member_period_dao = new $className();
+        $member_period_dao->membership_id = $membership_id;
+        $member_period_dao->find();
+        if( $member_period_dao )
+        {
+            while ($member_period_dao->fetch()) {
+                array_push($member_period_array, $member_period_dao);
+            }
+            return $member_period_array;
+        }
+        return NULL;
     }
 }
