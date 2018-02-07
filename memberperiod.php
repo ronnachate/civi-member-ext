@@ -204,7 +204,6 @@ function memberperiod_civicrm_post($op, $objectName, $objectId, &$objectRef) {
                 array_push($perios_ids, $membership_period->id);
             }
             if( count($perios_ids) > 0 ) {
-                error_log("Set ids ". implode(MEMBERSHIP_PERIOD_SESSION_DELIMITER, $perios_ids) . " -----------------------------");
                 $session->set(MEMBERSHIP_PERIOD_IDS_SESSION, implode(MEMBERSHIP_PERIOD_SESSION_DELIMITER, $perios_ids));
             }
             break;
@@ -213,7 +212,6 @@ function memberperiod_civicrm_post($op, $objectName, $objectId, &$objectRef) {
             //if found period id then update with contribution id
             $membership_period_ids_str = $session->get(MEMBERSHIP_PERIOD_IDS_SESSION);
             if ($membership_period_ids_str) {
-                error_log("Found " . $membership_period_ids_str." ---------------------------------------");
                 $membership_period_ids = explode(MEMBERSHIP_PERIOD_SESSION_DELIMITER, $membership_period_ids_str);
                 CRM_Memberperiod_BAO_MembershipPeriod::updateWithContribution($membership_period_ids, $objectRef->id);
             }
