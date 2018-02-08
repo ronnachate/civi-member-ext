@@ -2,7 +2,7 @@
 
 ![Screenshot](/images/screenshot.png)
 
-Extesion to disyplay history of membership rened or created.
+Extension to disyplay history when renew or create new membership.
 
 The extension is licensed under [AGPL-3.0](LICENSE.txt).
 
@@ -37,7 +37,7 @@ cv en memberperiod
 
 ## Usage
 
-(* FIXME: Where would a new user navigate to get started? What changes would they see? *)
+Meembership perios history will display as tab in contact view page.
 
 ## Known Issues
 
