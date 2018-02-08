@@ -242,7 +242,7 @@ function memberperiod_civicrm_post($op, $objectName, $objectId, &$objectRef) {
  * Implements hook_memberperiod_civicrm_tabset().
  * Create membership period tab on contact view page.
  */
-function memberperiod_memberperiod_civicrm_tabset($tabsetName, &$tabs, $context) {
+function memberperiod_civicrm_tabset($tabsetName, &$tabs, $context) {
     if ($tabsetName == 'civicrm/contact/view') {
         $contactId = $context['contact_id'];
         $url = CRM_Utils_System::url( 'civicrm/contact/membership/period', "reset=1&cid=$contactId" );
