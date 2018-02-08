@@ -1,15 +1,15 @@
-# com.civicrm.extension.memberperiod
+# CiviCRM membership period extension
 
 ![Screenshot](/images/screenshot.png)
 
-(*FIXME: In one or two paragraphs, describe what the extension does and why one would download it. *)
+Extesion to disyplay history of membership rened or created.
 
 The extension is licensed under [AGPL-3.0](LICENSE.txt).
 
 ## Requirements
 
-* PHP v5.4+
-* CiviCRM (*FIXME: Version number*)
+* PHP v5.6+
+* CiviCRM 4.7.*
 
 ## Installation (Web UI)
 
@@ -22,7 +22,7 @@ install it with the command-line tool [cv](https://github.com/civicrm/cv).
 
 ```bash
 cd <extension-dir>
-cv dl com.civicrm.extension.memberperiod@https://github.com/FIXME/com.civicrm.extension.memberperiod/archive/master.zip
+cv dl https://github.com/ronnachate/civi-member-ext/archive/master.zip
 ```
 
 ## Installation (CLI, Git)
@@ -31,7 +31,7 @@ Sysadmins and developers may clone the [Git](https://en.wikipedia.org/wiki/Git) 
 install it with the command-line tool [cv](https://github.com/civicrm/cv).
 
 ```bash
-git clone https://github.com/FIXME/com.civicrm.extension.memberperiod.git
+git clone https://github.com/ronnachate/civi-member-ext.git
 cv en memberperiod
 ```
 
@@ -41,4 +41,4 @@ cv en memberperiod
 
 ## Known Issues
 
-(* FIXME *)
+(* Nothings yet *)
