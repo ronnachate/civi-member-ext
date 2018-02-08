@@ -52,7 +52,7 @@ class CRM_Memberperiod_BAO_MembershipPeriod extends CRM_Memberperiod_DAO_Members
      * @return bool
     */
 
-    public static function getByMembershipId($membership_id) {
+    public static function getByMembershipId($membership_id, $is_include_contribution) {
         $member_period_array = Array();
         $className = MEMBERSHIP_PERIOD_CLASS_NAME;
         $member_period_dao = new $className();
@@ -61,7 +61,17 @@ class CRM_Memberperiod_BAO_MembershipPeriod extends CRM_Memberperiod_DAO_Members
         if( $member_period_dao )
         {
             while ($member_period_dao->fetch()) {
-                array_push($member_period_array, (Array)$member_period_dao);
+                $membership_as_array = (Array)$member_period_dao;
+                if( $is_include_contribution ) {
+                    $params = array('id' => $member_period_dao->contribution_id);
+                    $values = array();
+                    $ids = array();
+                    $contribution = CRM_Contribute_BAO_Contribution::getValues($params, $values, $ids);
+                    if( $contribution ) {
+                        $membership_as_array['contribution'] = (Array)$contribution;
+                    }
+                }
+                array_push($member_period_array, $membership_as_array);
             }
             return $member_period_array;
         }
