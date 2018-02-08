@@ -11,6 +11,8 @@ define('DEFAULT_DATETIME_FORMAT', 'YmdHis', true);
 define('PREVIUOS_MEMBERSHIP_END_DATE', 'YmdHis', true);
 define('MYSQL_DATE_FORMAT', 'Y-m-d H:i:s', true);
 define('DATE_DIFF_PATCHING', 5, true);
+define('OP_CREATE', 'create', true);
+define('OP_EDIT', 'edit', true);
 
 /**
  * Implements hook_civicrm_config().
@@ -133,14 +135,14 @@ function memberperiod_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) {
 }
 
 /**
- * Implements hook_civicrm_navigationMenu().
+ * Implements hook_civicrm_pre().
+ * Hooking when membership is created/edited/renewed.
+ * Clear period id session and get prevouos membership if exist
  *
- * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_navigationMenu
- *
- * */
+ */
 function memberperiod_civicrm_pre($op, $objectName, $id, &$params) {
-    if( $op == 'create') {
-        if( $objectName == MEMBERSHIP_OBJ_NAME) {
+    if( $objectName == MEMBERSHIP_OBJ_NAME) {
+        if( $op == OP_CREATE || $op == OP_EDIT ) {
             $session = CRM_Core_Session::singleton();
             //clear membeperiod id session
             $session->set(MEMBERSHIP_PERIOD_ID_SESSION, NULL);
@@ -158,11 +160,16 @@ function memberperiod_civicrm_pre($op, $objectName, $id, &$params) {
     }
 }
 
+/**
+ * Implements hook_civicrm_post().
+ * Hooking when membership is created/edited/renewed.
+ * Create membership period base on membership data
+ */
 function memberperiod_civicrm_post($op, $objectName, $objectId, &$objectRef) {
-    if( $op == 'create') {
-        $session = CRM_Core_Session::singleton();
-        switch ($objectName) {
-            case MEMBERSHIP_OBJ_NAME:
+    switch ($objectName) {
+        case MEMBERSHIP_OBJ_NAME:
+            if( $op == OP_CREATE || $op == OP_EDIT  ) {
+                $session = CRM_Core_Session::singleton();
                 //calculate term and date by membership_type_id
                 //get membership type
                 $params = array('id' => $objectRef->membership_type_id);
@@ -215,8 +222,10 @@ function memberperiod_civicrm_post($op, $objectName, $objectId, &$objectRef) {
                 if( count($perios_ids) > 0 ) {
                     $session->set(MEMBERSHIP_PERIOD_IDS_SESSION, implode(MEMBERSHIP_PERIOD_SESSION_DELIMITER, $perios_ids));
                 }
-                break;
-            case MEMBERSHIP_PAYMENT_OBJ_NAME:
+            }
+            break;
+        case MEMBERSHIP_PAYMENT_OBJ_NAME:
+            if( $op == OP_CREATE ) {
                 $session = CRM_Core_Session::singleton();
                 //if found period id then update with contribution id
                 $membership_period_ids_str = $session->get(MEMBERSHIP_PERIOD_IDS_SESSION);
@@ -224,12 +233,16 @@ function memberperiod_civicrm_post($op, $objectName, $objectId, &$objectRef) {
                     $membership_period_ids = explode(MEMBERSHIP_PERIOD_SESSION_DELIMITER, $membership_period_ids_str);
                     CRM_Memberperiod_BAO_MembershipPeriod::updateWithContribution($membership_period_ids, $objectRef->id);
                 }
-                break;
-        }
+            }
+            break;
     }
 }
 
-function memberperiod_civicrm_tabset($tabsetName, &$tabs, $context) {
+/**
+ * Implements hook_memberperiod_civicrm_tabset().
+ * Create membership period tab on contact view page.
+ */
+function memberperiod_memberperiod_civicrm_tabset($tabsetName, &$tabs, $context) {
     if ($tabsetName == 'civicrm/contact/view') {
         $contactId = $context['contact_id'];
         $url = CRM_Utils_System::url( 'civicrm/contact/membership/period', "reset=1&cid=$contactId" );
