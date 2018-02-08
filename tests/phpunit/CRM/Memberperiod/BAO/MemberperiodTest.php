@@ -32,9 +32,11 @@ class CRM_Memberperiod_BAO_MemberperiodTest extends CiviUnitTestCase {
     public function setUp() {
         parent::setUp();
         //set up test contact
-        $this->_contactId= $this->organizationCreate();
+        $this->_contactId = $this->organizationCreate();
         $this->_membershipId = $this->contactMembershipCreate(array('contact_id' => $this->_contactId));
-        $params = array();
+        $params = array(
+            'contact_id' => $this->_contactId
+        );
         $contribution = $this->contributionCreate($params);
         $this->_contributionId = $contribution->id;
     }
@@ -42,6 +44,7 @@ class CRM_Memberperiod_BAO_MemberperiodTest extends CiviUnitTestCase {
     public function tearDown() {
         parent::tearDown();
         $this->contactDelete($this->_contactID);
+        $this->contributionDelete($this->_contributionId);
         $this->_memberId = NULL;
     }
 
