@@ -232,8 +232,7 @@ function memberperiod_civicrm_post($op, $objectName, $objectId, &$objectRef) {
 function memberperiod_civicrm_tabset($tabsetName, &$tabs, $context) {
     if ($tabsetName == 'civicrm/contact/view') {
         $contactId = $context['contact_id'];
-        $url = CRM_Utils_System::url( 'civicrm/contact/membership/period',
-                                      "reset=1&cid=$contactId" );
+        $url = CRM_Utils_System::url( 'civicrm/contact/membership/period', "reset=1&cid=$contactId" );
         $tabs[] = array( 'id' => 'memberperiodTab',
           'url'   => $url,
           'title' => 'Membership history',

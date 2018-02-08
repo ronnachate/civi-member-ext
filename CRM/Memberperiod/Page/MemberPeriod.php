@@ -17,7 +17,6 @@ class CRM_Memberperiod_Page_MemberPeriod extends CRM_Core_Page {
             //get membership period
             $membership_periods = CRM_Memberperiod_BAO_MembershipPeriod::getByMembershipId($membership->id);
             if( $membership_periods ) {
-                error_log( gettype($membership_periods));
                 $this->assign( 'membershipPeriods', $membership_periods);
             }
         }
