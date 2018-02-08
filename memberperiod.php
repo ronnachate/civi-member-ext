@@ -225,13 +225,15 @@ function memberperiod_civicrm_post($op, $objectName, $objectId, &$objectRef) {
             }
             break;
         case MEMBERSHIP_PAYMENT_OBJ_NAME:
+            // not use paymnet due to if not member payment not create membersip will not link to contribution
+            // and make membership period not math with membership data
             if( $op == OP_CREATE ) {
                 $session = CRM_Core_Session::singleton();
                 //if found period id then update with contribution id
                 $membership_period_ids_str = $session->get(MEMBERSHIP_PERIOD_IDS_SESSION);
                 if ($membership_period_ids_str) {
                     $membership_period_ids = explode(MEMBERSHIP_PERIOD_SESSION_DELIMITER, $membership_period_ids_str);
-                    CRM_Memberperiod_BAO_MembershipPeriod::updateWithContribution($membership_period_ids, $objectRef->id);
+                    CRM_Memberperiod_BAO_MembershipPeriod::updateWithContribution($membership_period_ids, $objectRef->contribution_id);
                 }
             }
             break;
