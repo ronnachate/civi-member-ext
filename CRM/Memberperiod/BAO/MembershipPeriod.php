@@ -61,7 +61,7 @@ class CRM_Memberperiod_BAO_MembershipPeriod extends CRM_Memberperiod_DAO_Members
         if( $member_period_dao )
         {
             while ($member_period_dao->fetch()) {
-                array_push($member_period_array, $member_period_dao);
+                array_push($member_period_array, (Array)$member_period_dao);
             }
             return $member_period_array;
         }

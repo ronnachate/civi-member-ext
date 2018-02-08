@@ -14,7 +14,7 @@
         </th>
     </tr>
     </thead>
-    {*
+    
     {foreach from=$membershipPeriods item="membershipPeriod"}
       <tr>
           <td>{$membershipPeriod.start_date|crmDate}</td>
@@ -22,6 +22,6 @@
           <td>{$membershipPeriod.created_at|crmDate}</td>
       </tr>
     {/foreach}
-    *}
+    
   </table>
 {/strip}
