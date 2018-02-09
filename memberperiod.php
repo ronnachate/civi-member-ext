@@ -145,7 +145,7 @@ function memberperiod_civicrm_pre($op, $objectName, $id, &$params) {
         if( $op == OP_CREATE || $op == OP_EDIT ) {
             $session = CRM_Core_Session::singleton();
             //clear membeperiod id session
-            $session->set(MEMBERSHIP_PERIOD_ID_SESSION, NULL);
+            $session->set(MEMBERSHIP_PERIOD_IDS_SESSION, NULL);
             $session->set(PREVIUOS_MEMBERSHIP_END_DATE, NULL);
             if( $id ) {
                 $get_params = array('id' => $id);
