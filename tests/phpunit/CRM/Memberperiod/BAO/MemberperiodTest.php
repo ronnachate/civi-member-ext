@@ -39,20 +39,11 @@ class CRM_Memberperiod_BAO_MemberperiodTest extends CiviUnitTestCase implements 
         //set up test contact
         $this->_contactId = $this->organizationCreate();
         $this->_membershipId = $this->contactMembershipCreate(array('contact_id' => $this->_contactId));
-        //contribution away return duplicate
-        // $params = array(
-        //     'contact_id' => $this->_contactId,
-        //     'trxn_id' => 67890,
-        //     'invoice_id' => 1234567,
-        // );
-        // $contribution = $this->contributionCreate($params);
-        // $this->_contributionId = $contribution->id;;
     }
 
     public function tearDown() {
         parent::tearDown();
         $this->contactDelete($this->_contactID);
-        //$this->contributionDelete($this->_contributionId);
         $this->_memberId = NULL;
     }
 
@@ -86,13 +77,17 @@ class CRM_Memberperiod_BAO_MemberperiodTest extends CiviUnitTestCase implements 
         $membership_period_id = $this->assertDBNotNull('CRM_Memberperiod_BAO_MembershipPeriod', $this->_membershipId, 'id',
             'membership_id', 'Database check for created membership period'
         );
-        //contribution away return duplicate
-
-        // $membership_period_ids = array($membership_period_id);
-        // CRM_Memberperiod_BAO_MembershipPeriod::updateWithContribution($membership_period_ids, $this->_contributionId);
-        // $membership_period_id = $this->assertDBNotNull('CRM_Memberperiod_BAO_MembershipPeriod', $this->_contributionId, 'id',
-        //     'contribution_id', 'Database check for update membeship period with contribution_id'
-        // );
+        $params = array(
+            'contact_id' => $this->_contactId,
+            'trxn_id' => 67890,
+            'invoice_id' => 1234567,
+        );
+        $contributionId = $this->contributionCreate($params);
+        $membership_period_ids = array($membership_period_id);
+        CRM_Memberperiod_BAO_MembershipPeriod::updateWithContribution($membership_period_ids, $contributionId);
+        $membership_period_id = $this->assertDBNotNull('CRM_Memberperiod_BAO_MembershipPeriod', $contributionId, 'id',
+            'contribution_id', 'Database check for update membeship period with contribution_id'
+        );
     }
 
     /**
