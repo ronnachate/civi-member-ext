@@ -29,8 +29,8 @@ class CRM_Memberperiod_BAO_MemberperiodTest extends CiviUnitTestCase implements 
         // Civi\Test has many helpers, like install(), uninstall(), sql(), and sqlFile().
         // See: https://github.com/civicrm/org.civicrm.testapalooza/blob/master/civi-test.md
         return \Civi\Test::e2e()
-        ->sqlFile(__DIR__ . '/../../../../../sql/auto_install.sql')
-        ->installMe(__DIR__. '/../../../..')
+        ->sqlFile(__DIR__ . '/../../../../sql/auto_install.sql')
+        ->installMe(__DIR__. '/../../..')
         ->apply();
     }
 
