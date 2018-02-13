@@ -178,42 +178,56 @@ function memberperiod_civicrm_post($op, $objectName, $objectId, &$objectRef) {
                 $duration = $membership_type->duration_interval;
                 $duration_unit = $membership_type->duration_unit;
                 $terms = 0;
-                $term_end_date = new DateTime();
-                $terms_start_date = new DateTime($objectRef->start_date);
-                $previuod_endate_str = CRM_Core_Session::singleton()->get(PREVIUOS_MEMBERSHIP_END_DATE);
-                if( $previuod_endate_str ) {
-                    $terms_start_date = new DateTime($previuod_endate_str);
-                }
-                $membership_end_date = new DateTime($objectRef->end_date);
-                //fix attr y in date diff function
-                $membership_end_date->add(new DateInterval('P'.DATE_DIFF_PATCHING.'D'));
-                $diff = date_diff($membership_end_date,  $terms_start_date);
-                if( $duration_unit == 'year') {
-                    $terms = $diff->y / $duration;
-                }
-                else if( $duration_unit == 'month') {
-                    $terms = $diff->m / $duration;
-                }
-                $term_end_date = $terms_start_date;
-                $perios_ids = array();
-                for ($i = 0; $i < $terms; $i++) {
-                    $mysql_start_date = $term_end_date->format(MYSQL_DATE_FORMAT);
-                    //calculate end date of current term
-                    $interval_str = 'P'.$duration;
+                if( $objectRef->end_date )
+                {
+                    $term_end_date = new DateTime();
+                    $terms_start_date = new DateTime($objectRef->start_date);
+                    $previuod_endate_str = CRM_Core_Session::singleton()->get(PREVIUOS_MEMBERSHIP_END_DATE);
+                    if( $previuod_endate_str ) {
+                        $terms_start_date = new DateTime($previuod_endate_str);
+                    }
+                    $membership_end_date = new DateTime($objectRef->end_date);
+                    //fix attr y in date diff function
+                    $membership_end_date->add(new DateInterval('P'.DATE_DIFF_PATCHING.'D'));
+                    $diff = date_diff($membership_end_date,  $terms_start_date);
                     if( $duration_unit == 'year') {
-                        $interval_str .= 'Y';
+                        $terms = $diff->y / $duration;
                     }
                     else if( $duration_unit == 'month') {
-                        $interval_str .= 'M';
+                        $terms = $diff->m / $duration;
                     }
-                    $term_end_date->add(new DateInterval($interval_str));
-                    $mysql_end_date = $term_end_date->format(MYSQL_DATE_FORMAT);
-                    //store period record
-                    $now = date(DEFAULT_DATETIME_FORMAT);
+                    $term_end_date = $terms_start_date;
+                    $perios_ids = array();
+                    for ($i = 0; $i < $terms; $i++) {
+                        $mysql_start_date = $term_end_date->format(MYSQL_DATE_FORMAT);
+                        //calculate end date of current term
+                        $interval_str = 'P'.$duration;
+                        if( $duration_unit == 'year') {
+                            $interval_str .= 'Y';
+                        }
+                        else if( $duration_unit == 'month') {
+                            $interval_str .= 'M';
+                        }
+                        $term_end_date->add(new DateInterval($interval_str));
+                        $mysql_end_date = $term_end_date->format(MYSQL_DATE_FORMAT);
+                        //store period record
+                        $now = date(DEFAULT_DATETIME_FORMAT);
+                        $membership_period_obj = array(
+                            'membership_id' => $objectRef->id,
+                            'start_date' => $mysql_start_date,
+                            'end_date' => $mysql_end_date,
+                            'created_at' => CRM_Utils_Date::isoToMysql($now)
+                        );
+                        $membership_period = CRM_Memberperiod_BAO_MembershipPeriod::createOrUpdate($membership_period_obj);
+                        array_push($perios_ids, $membership_period->id);
+                    }
+                }
+                else {
+                    //single term with no end_date
                     $membership_period_obj = array(
                         'membership_id' => $objectRef->id,
-                        'start_date' => $mysql_start_date,
-                        'end_date' => $mysql_end_date,
+                        'start_date' => CRM_Utils_Date::isoToMysql($objectRef->start_date),
+                        'end_date' => CRM_Utils_Date::isoToMysql($objectRef->end_date),
                         'created_at' => CRM_Utils_Date::isoToMysql($now)
                     );
                     $membership_period = CRM_Memberperiod_BAO_MembershipPeriod::createOrUpdate($membership_period_obj);

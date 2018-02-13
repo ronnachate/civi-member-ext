@@ -23,7 +23,12 @@
         {foreach from=$membershipPeriods item="membershipPeriod"}
         <tr>
             <td>{$membershipPeriod.start_date|crmDate}</td>
-            <td>{$membershipPeriod.end_date|crmDate}</td>
+            {assign "end_date" "No expired date"}
+            {if $membershipPeriod.end_date }
+            {
+                {assign "end_date" $membershipPeriod.end_date|crmDate}
+            }
+            <td>{$end_date}</td>
             <td>{$membershipPeriod.created_at|crmDate}</td>
             {if $accessContribution}
                 <td>
