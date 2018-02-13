@@ -36,6 +36,7 @@
     <title>Membership Period End Date</title>
     <type>date</type>
     <import>true</import>
+    <required>false</required>
     <comment>End date of membership period</comment>
     <add>4.7</add>
   </field>
